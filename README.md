@@ -17,6 +17,8 @@ pip install -r requirements.txt
 ### OAuth Client Application
 Follow the steps decribed here: [O365/python-o365: A simple python library to interact with Microsoft Graph and Office 365 API](https://github.com/O365/python-o365#authentication-steps)
 
+Make sure to add the `Calendars.Read` scope.
+
 ### App Config
 Copy the `credentials_template.py` file to `credentials.py` and replace the placeholders with the `client id` and the 
 `client secret` from the step before. 

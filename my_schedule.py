@@ -105,12 +105,14 @@ def get_calendar():
     account = Account(credentials)
 
     if account.is_authenticated is False:
-        click.echo("You are not authenticated. Call 'my_schedule.py logon' first", err=True)
+        click.echo(
+            "You are not authenticated. Call 'my_schedule.py logon' first", err=True
+        )
         sys.exit(-1)
 
     protocol = MSGraphProtocol()  # or maybe a user defined protocol
     con = Connection(
-        ("d88587e5-05fe-4cba-b55e-4ad32b71891c", "-69Y81MKQ-4u3NJ6YKFgb_BQCBTx99o.-y"),
+        credentials,
         scopes=[
             "https://graph.microsoft.com/User.Read",
             "https://graph.microsoft.com/Calendars.Read",
