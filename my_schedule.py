@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 import click
 from O365 import MSGraphProtocol, Connection, Account
 from O365.utils import ApiComponent
-from art import text2art
 from dateutil.tz import tz
 
 from credentials import credentials
@@ -153,5 +152,4 @@ def tomorrow():
 
 
 if __name__ == "__main__":
-    # click.echo(text2art("My Schedule", font="small"))
     main()
