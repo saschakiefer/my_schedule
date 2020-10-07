@@ -9,11 +9,6 @@ from dateutil.tz import tz
 
 from credentials import credentials
 
-"""
-rename the credentials_template.py to credentials.py and insert your
-own O365 credentials
-"""
-
 
 class Calendar(ApiComponent):
     _endpoints = {"my_url_key": "/calendarview"}
@@ -30,18 +25,18 @@ class Calendar(ApiComponent):
         # to change the service_url implement your own protocol inheriting from Protocol Class
         url = self.build_url(self._endpoints.get("my_url_key"))
 
-        my_params = {
+        query_parameters = {
             "startdatetime": date.strftime("%Y-%m-%d"),
             "enddatetime": (date + timedelta(days=1)).strftime("%Y-%m-%d"),
             "$select": "subject,organizer,attendees,start,end,location,isAllDay,webLink",
         }
 
-        response = self.con.get(url, params=my_params)
-
+        response = self.con.get(url, params=query_parameters)
         schedule = json.loads(response.text)
 
         my_day = []
         for event in schedule["value"]:
+            # Filter some events that don't need minutes
             if event["subject"] in ["Fokuszeit", "Block", "Mittagessen", "Date Night"]:
                 continue
 
@@ -49,10 +44,10 @@ class Calendar(ApiComponent):
             if event["isAllDay"]:
                 continue
 
-            # Convert Start Time
-            start_ts = datetime.fromisoformat(event["start"]["dateTime"][:-8])
-            start_ts = start_ts.replace(tzinfo=tz.gettz(event["start"]["timeZone"]))
-            start_ts = start_ts.astimezone(tz.tzlocal())
+            # Convert Start Time into local timezone
+            start_time = datetime.fromisoformat(event["start"]["dateTime"][:-8])
+            start_time = start_time.replace(tzinfo=tz.gettz(event["start"]["timeZone"]))
+            start_time = start_time.astimezone(tz.tzlocal())
 
             # Participants
             participants = []
@@ -67,18 +62,20 @@ class Calendar(ApiComponent):
             # Attendees
             if len(event["attendees"]) < 20:  # More than 20 is a broadcast
                 for attendee in event["attendees"]:
+                    email = attendee["emailAddress"]["address"]
+                    name = attendee["emailAddress"]["name"]
+
                     if (
-                        attendee["emailAddress"]["address"] != "sascha.kiefer@sap.com"
-                        and ("#[[" + attendee["emailAddress"]["name"] + "]]")
-                        not in participants
+                        email != "sascha.kiefer@sap.com"  # don't need me in the list
+                        and ("#[[" + name + "]]")
+                        not in participants  # filter the organizer from the attendees list
+                        and name.startswith("DL ") is False  # Filter Delivery Lists
                     ):
-                        participants.append(
-                            "#[[" + attendee["emailAddress"]["name"] + "]]"
-                        )
+                        participants.append("#[[" + name + "]]")
 
             my_day.append(
                 {
-                    "start_time": start_ts,
+                    "start_time": start_time,
                     "subject": event["subject"],
                     "participants": participants,
                     "link": event["webLink"],
