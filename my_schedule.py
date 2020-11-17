@@ -56,7 +56,7 @@ class Calendar(ApiComponent):
             # I don't need myself in the participants list
             if event["organizer"]["emailAddress"]["address"] != "sascha.kiefer@sap.com":
                 participants.append(
-                    "[[" + event["organizer"]["emailAddress"]["name"] + "]]"
+                    "[[@" + event["organizer"]["emailAddress"]["name"] + "]]"
                 )
 
             # Attendees
@@ -67,11 +67,11 @@ class Calendar(ApiComponent):
 
                     if (
                         email != "sascha.kiefer@sap.com"  # don't need me in the list
-                        and ("[[" + name + "]]")
+                        and ("[[@" + name + "]]")
                         not in participants  # filter the organizer from the attendees list
                         and name.startswith("DL ") is False  # Filter Delivery Lists
                     ):
-                        participants.append("[[" + name + "]]")
+                        participants.append("[[@" + name + "]]")
 
             my_day.append(
                 {
