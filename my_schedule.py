@@ -37,7 +37,7 @@ class Calendar(ApiComponent):
         my_day = []
         for event in schedule["value"]:
             # Filter some events that don't need minutes
-            if event["subject"] in ["Fokuszeit", "Block", "Mittagessen", "Date Night"]:
+            if event["subject"] in ["Block", "Mittagessen", "Date Night"] or event['subject'].startswith('Fokuszeit'):
                 continue
 
             # I'm not interested in all day events
